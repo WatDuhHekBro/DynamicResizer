@@ -1,0 +1,11 @@
+{
+	"name": "Window Resizer++",
+	"version": "4.2.0",
+	"manifest_version": 2,
+	"background": {"page": "background.html"},
+	"browser_action":
+	{
+		"default_title": "Window Resizer++",
+		"default_popup": "popup.html"
+	}
+}
