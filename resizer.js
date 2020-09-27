@@ -14,7 +14,7 @@ function resize(width, height, offsetX, offsetY)
 
 // Extension popups don't allow inline JavaScript, so onclick is useless in the document.
 const eventTable = {
-	youtube: [512, 453, 620, 325],
+	youtube: [512, 448, 650, 345],
 	crunchyroll: [692, 498, 535, 310]
 };
 
