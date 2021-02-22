@@ -3,8 +3,7 @@
 	"version": "4.2.0a",
 	"manifest_version": 2,
 	"background": {"page": "background.html"},
-	"browser_action":
-	{
+	"browser_action": {
 		"default_title": "Window Resizer++",
 		"default_popup": "popup.html"
 	}

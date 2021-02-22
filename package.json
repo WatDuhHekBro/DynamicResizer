@@ -1,0 +1,21 @@
+{
+	"name": "dynamic-resizer",
+	"version": "1.0.0",
+	"description": "Simple window resizer with presets and a control panel that dynamically updates.",
+	"scripts": {
+		"start": "start tsc --watch && web-ext run",
+		"compile": "tsc",
+		"compile-prod": "tsc --project tsconfig.prod.json",
+		"build": "npm run compile-prod && web-ext build",
+		"sign": "npm run compile-prod && cross-env-shell web-ext sign --api-key $WEB_EXT_API_KEY --api-secret $WEB_EXT_API_SECRET",
+		"format": "prettier --write **/*"
+	},
+	"author": "WatDuhHekBro",
+	"license": "MIT",
+	"devDependencies": {
+		"cross-env": "^7.0.3",
+		"prettier": "^2.2.1",
+		"typescript": "^4.1.5",
+		"web-ext": "^5.5.0"
+	}
+}

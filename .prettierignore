@@ -1,0 +1,6 @@
+.gitignore
+.prettierignore
+.web-extension-id
+LICENSE
+*.js.map
+src/*.js
