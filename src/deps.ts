@@ -8,6 +8,6 @@ import {Browser} from "webextension-polyfill-ts";
 
 declare global {
 	var React: any;
-	class Component extends ReactComponent {}
+	class Component<P = {}, S = {}, SS = any> extends ReactComponent<P, S, SS> {}
 	var browser: Browser;
 }

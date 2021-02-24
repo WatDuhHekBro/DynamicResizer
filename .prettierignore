@@ -3,5 +3,6 @@
 web-ext-artifacts/
 .web-extension-id
 LICENSE
+*.md
 dist/
 .husky/

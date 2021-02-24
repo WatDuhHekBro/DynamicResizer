@@ -1,9 +1,10 @@
 {
-	"name": "Window Resizer++",
-	"version": "4.2.0a",
+	"name": "dynamic-resizer",
+	"version": "1.0.0",
 	"manifest_version": 2,
+	"permissions": ["storage"],
 	"browser_action": {
-		"default_title": "Window Resizer++",
+		"default_title": "Dynamic Resizer",
 		"default_popup": "popup.html"
 	}
 }

@@ -2,9 +2,10 @@ const Copier = require("copy-webpack-plugin");
 
 module.exports = {
 	mode: "production",
+	devtool: "source-map",
 	entry: {
 		deps: "./src/deps.ts",
-		resizer: "./src/resizer.tsx"
+		popup: "./src/popup.tsx"
 	},
 	output: {
 		path: `${__dirname}/dist`,
