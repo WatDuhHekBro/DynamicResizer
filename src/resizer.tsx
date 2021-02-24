@@ -1,16 +1,24 @@
-declare var chrome: any; // no idea on how to fix this
+class Test extends Component {
+	render() {
+		return <h1>test</h1>;
+	}
+}
+
+ReactDOM.render(<Test></Test>, document.getElementById("root"));
 
 // This is the core operation that resizes windows.
 // Also, for whatever reason, you have to have a background page even if it's completely empty. Otherwise, you won't have access to the "chrome" variable.
-function resize(width: number, height: number, offsetX: number, offsetY: number) {
-	chrome.windows.getCurrent((win: any) => {
-		chrome.windows.update(win.id, {
+async function resize(width: number, height: number, offsetX: number, offsetY: number) {
+	const window = await browser.windows.getCurrent();
+
+	if (window.id) {
+		browser.windows.update(window.id, {
 			top: offsetY,
 			left: offsetX,
 			width: width,
 			height: height
 		});
-	});
+	}
 }
 
 // Extension popups don't allow inline JavaScript, so onclick is useless in the document.

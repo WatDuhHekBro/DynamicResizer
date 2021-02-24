@@ -1,4 +1,4 @@
 module.exports = {
-	sourceDir: "src",
-	ignoreFiles: ["**/*.ts", "**/*.js.map"]
+	sourceDir: "dist",
+	ignoreFiles: ["**/*.js.map"]
 };

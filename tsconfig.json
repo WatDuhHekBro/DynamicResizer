@@ -8,6 +8,7 @@
 		"forceConsistentCasingInFileNames": true,
 		"esModuleInterop": true,
 		"lib": ["ES2020", "DOM"],
+		"jsx": "react",
 
 		// Output //
 		"target": "ES2020",

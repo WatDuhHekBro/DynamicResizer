@@ -1,5 +1,4 @@
 web-ext-artifacts/
 .web-extension-id
 node_modules/
-src/*.js
-*.js.map
+dist/

@@ -1,6 +1,7 @@
 .gitignore
 .prettierignore
+web-ext-artifacts/
 .web-extension-id
 LICENSE
-*.js.map
-src/*.js
+dist/
+.husky/
