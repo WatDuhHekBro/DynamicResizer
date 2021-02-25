@@ -1,3 +1,4 @@
+import {browser} from "webextension-polyfill-ts";
 export const USER_NAMESPACE_PREFIX = "user:";
 
 // This is the core operation that resizes windows.

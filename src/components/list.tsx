@@ -1,3 +1,5 @@
+import React, {Component} from "react";
+import {ReactSortable} from "react-sortablejs";
 import {resize, deletePreset, WindowTable, Dimensions, ActiveEdit} from "../util";
 
 // todo: order of entries, move function
@@ -50,7 +52,7 @@ class Item extends Component<ItemProps> {
 		const inEditMode = this.props.inEditMode;
 
 		return (
-			<li>
+			<li draggable={true}>
 				{inEditMode && <button onClick={() => console.log("todo reorder")}>≡</button>}
 				{inEditMode ? (
 					<button onClick={this.props.callEditMode}>{`${this.props.children} ${

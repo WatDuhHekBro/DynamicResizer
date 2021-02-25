@@ -1,3 +1,5 @@
+import React, {Component} from "react";
+import {browser} from "webextension-polyfill-ts";
 import {savePreset, ActiveEdit, ActiveEditChanges, WindowTable} from "../util";
 
 export class EditPane extends Component<EditPaneProps> {
@@ -18,6 +20,7 @@ export class EditPane extends Component<EditPaneProps> {
 						}}
 						id="editPresetTag"
 						intialValue={this.props.activeEdit.presetTag ?? ""}
+						placeholder="This field is required."
 					>
 						Preset Tag
 					</InputField>
@@ -144,6 +147,7 @@ class InputField extends Component<InputFieldProps> {
 					}}
 					id={this.props.id}
 					value={this.props.intialValue ?? ""}
+					placeholder={this.props.placeholder}
 				></input>
 			</div>
 		);
@@ -154,5 +158,6 @@ type InputFieldProps = {
 	type: string;
 	id: string;
 	intialValue?: string;
+	placeholder?: string;
 	onInput: (value: string | null) => void;
 };

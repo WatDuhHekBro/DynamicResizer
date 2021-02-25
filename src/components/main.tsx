@@ -1,3 +1,5 @@
+import React, {Component} from "react";
+import {browser} from "webextension-polyfill-ts";
 import {ButtonListPane} from "./list";
 import {EditPane} from "./edit";
 import {USER_NAMESPACE_PREFIX, ActiveEdit, WindowTable, OptionalNumber} from "../util";

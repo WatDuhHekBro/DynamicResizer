@@ -4,7 +4,6 @@ module.exports = {
 	mode: "production",
 	devtool: "source-map",
 	entry: {
-		deps: "./src/deps.ts",
 		popup: "./src/popup.tsx"
 	},
 	output: {
@@ -33,4 +32,11 @@ module.exports = {
 			]
 		})
 	]
+	// Probably figure this out sometime, I'm noticing some duplicate dependencies.
+	/*optimization: {
+		splitChunks: {
+			chunks: "all",
+			name: false
+		}
+	}*/
 };

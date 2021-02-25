@@ -11,19 +11,24 @@
 	},
 	"author": "WatDuhHekBro",
 	"license": "MIT",
+	"dependencies": {
+		"react": "^17.0.1",
+		"react-dom": "^17.0.1",
+		"react-sortablejs": "^6.0.0",
+		"sortablejs": "^1.13.0",
+		"webextension-polyfill": "^0.7.0"
+	},
 	"devDependencies": {
 		"@types/react": "^17.0.2",
 		"@types/react-dom": "^17.0.1",
+		"@types/sortablejs": "^1.10.6",
 		"copy-webpack-plugin": "^7.0.0",
 		"cross-env": "^7.0.3",
 		"husky": "^5.1.1",
 		"prettier": "^2.2.1",
-		"react": "^17.0.1",
-		"react-dom": "^17.0.1",
 		"ts-loader": "^8.0.17",
 		"typescript": "^4.1.5",
 		"web-ext": "^5.5.0",
-		"webextension-polyfill": "^0.7.0",
 		"webextension-polyfill-ts": "^0.25.0",
 		"webpack": "^5.24.1",
 		"webpack-cli": "^4.5.0"
