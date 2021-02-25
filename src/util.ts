@@ -12,9 +12,6 @@ export async function resize(preset: Dimensions) {
 			height: preset[3]
 		});
 	}
-
-	// only if window.state === "normal" should the control panel capture the window size
-	//console.log(window.left, window.top, window.width, window.height, window.state === "normal");
 }
 
 export function savePreset(
@@ -28,6 +25,7 @@ export function savePreset(
 	browser.storage.local.set({
 		[USER_NAMESPACE_PREFIX + presetTag]: preset
 	});
+	resize(preset);
 }
 
 export function deletePreset(presetTag: string) {

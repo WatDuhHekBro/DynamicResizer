@@ -158,17 +158,18 @@ export class App extends Component<{}, AppState> {
 						activeEdit={activeEdit}
 						modifyActive={(changes) => {
 							// If activePreset is undefined, just skip it because that means the dimensions are being modified.
-							// Otherwise, ignore any other changes and pull from the active preset specified (if it exists).
-							if (changes.activePreset === undefined) {
-								this.setState({
-									offsetX: resolveChangedNumber(changes.offsetX, activeEdit.offsetX),
-									offsetY: resolveChangedNumber(changes.offsetY, activeEdit.offsetY),
-									width: resolveChangedNumber(changes.width, activeEdit.width),
-									height: resolveChangedNumber(changes.height, activeEdit.height)
-								});
-							} else {
-								this.loadDimensionsFromNewTagIfExists(changes.activePreset);
-							}
+							// Otherwise, ignore any other changes and update the specified preset.
+							// The reason I'm not pulling existing data into the fields is because it messes with simply renaming a preset.
+							// And if a user wants to overwrite a prefix, they'll be notified through the edit icon and save button text, but it's their choice.
+							// After all, if they wanted to, they could just click the edit button themselves.
+							this.setState({
+								presetTag:
+									changes.activePreset !== undefined ? changes.activePreset : activeEdit.presetTag,
+								offsetX: resolveChangedNumber(changes.offsetX, activeEdit.offsetX),
+								offsetY: resolveChangedNumber(changes.offsetY, activeEdit.offsetY),
+								width: resolveChangedNumber(changes.width, activeEdit.width),
+								height: resolveChangedNumber(changes.height, activeEdit.height)
+							});
 						}}
 					></EditPane>
 				)}

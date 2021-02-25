@@ -1,6 +1,5 @@
 import {savePreset, ActiveEdit, ActiveEditChanges, WindowTable} from "../util";
 
-// todo: update from window's existing size, auto-center, send existing preset to editor
 export class EditPane extends Component<EditPaneProps> {
 	render() {
 		const presets = this.props.presets;
@@ -26,7 +25,7 @@ export class EditPane extends Component<EditPaneProps> {
 						type="number"
 						onInput={(value) => {
 							const num = Number(value);
-							if (value && num) this.props.modifyActive({offsetX: num});
+							if (value && isFinite(num)) this.props.modifyActive({offsetX: num});
 						}}
 						id="editOffsetX"
 						intialValue={this.props.activeEdit.offsetX?.toString()}
@@ -37,7 +36,7 @@ export class EditPane extends Component<EditPaneProps> {
 						type="number"
 						onInput={(value) => {
 							const num = Number(value);
-							if (value && num) this.props.modifyActive({offsetY: num});
+							if (value && isFinite(num)) this.props.modifyActive({offsetY: num});
 						}}
 						id="editOffsetY"
 						intialValue={this.props.activeEdit.offsetY?.toString()}
@@ -48,7 +47,7 @@ export class EditPane extends Component<EditPaneProps> {
 						type="number"
 						onInput={(value) => {
 							const num = Number(value);
-							if (value && num) this.props.modifyActive({width: num});
+							if (value && isFinite(num)) this.props.modifyActive({width: num});
 						}}
 						id="editWidth"
 						intialValue={this.props.activeEdit.width?.toString()}
@@ -59,7 +58,7 @@ export class EditPane extends Component<EditPaneProps> {
 						type="number"
 						onInput={(value) => {
 							const num = Number(value);
-							if (value && num) this.props.modifyActive({height: num});
+							if (value && isFinite(num)) this.props.modifyActive({height: num});
 						}}
 						id="editHeight"
 						intialValue={this.props.activeEdit.height?.toString()}
@@ -67,7 +66,38 @@ export class EditPane extends Component<EditPaneProps> {
 						Height
 					</InputField>
 				</div>
-				<button>Auto Center</button>
+				<button
+					onClick={async () => {
+						const window = await browser.windows.getCurrent();
+						this.props.modifyActive({
+							offsetX: window.left,
+							offsetY: window.top,
+							width: window.width,
+							height: window.height
+						});
+					}}
+				>
+					Use Current Window
+				</button>
+				<button
+					onClick={() => {
+						const activeEdit = this.props.activeEdit;
+						let offsetX = undefined;
+						let offsetY = undefined;
+
+						if (activeEdit.width !== undefined) offsetX = Math.floor((screen.width - activeEdit.width) / 2);
+						if (activeEdit.height !== undefined)
+							offsetY = Math.floor((screen.height - activeEdit.height) / 2);
+
+						// Apparently, I need to group up these calls into one or else it won't work.
+						this.props.modifyActive({
+							offsetX,
+							offsetY
+						});
+					}}
+				>
+					Auto Center
+				</button>
 				<button
 					onClick={() => {
 						const activeEdit = this.props.activeEdit;
@@ -81,15 +111,6 @@ export class EditPane extends Component<EditPaneProps> {
 								activeEdit.width,
 								activeEdit.height
 							);
-
-							// Then automatically clear the fields once the user has confirmed their settings.
-							this.props.modifyActive({
-								activePreset: null,
-								offsetX: null,
-								offsetY: null,
-								width: null,
-								height: null
-							});
 						}
 					}}
 				>

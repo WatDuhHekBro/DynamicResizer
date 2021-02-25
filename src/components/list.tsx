@@ -53,7 +53,7 @@ class Item extends Component<ItemProps> {
 			<li>
 				{inEditMode && <button onClick={() => console.log("todo reorder")}>≡</button>}
 				{inEditMode ? (
-					<button onClick={this.props.callEditMode}>{`${this.props.children as string} ${
+					<button onClick={this.props.callEditMode}>{`${this.props.children} ${
 						this.props.isActive ? "✏️" : "🔧"
 					}`}</button>
 				) : (
