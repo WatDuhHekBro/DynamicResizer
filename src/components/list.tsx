@@ -12,14 +12,17 @@ export class ButtonListPane extends Component<ButtonListPaneProps> {
 				const preset = presets[presetTag];
 				items.push(
 					<Item
-						tag={presetTag}
 						dimensions={preset}
 						inEditMode={this.props.inEditMode}
 						isActive={presetTag === this.props.activeEdit.presetTag}
-						callEditMode={() => {
-							this.props.setActivePreset(
-								this.props.activeEdit.presetTag === presetTag ? null : presetTag
-							);
+						callEditMode={() =>
+							// Bring an existing preset into the editor, communicated via main (<App/>).
+							this.props.setActivePreset(this.props.activeEdit.presetTag === presetTag ? null : presetTag)
+						}
+						callDelete={() => {
+							// Delete the specified preset from storage and clear fields if the user is editing said preset.
+							deletePreset(presetTag);
+							if (this.props.activeEdit.presetTag === presetTag) this.props.resetFields();
 						}}
 					>
 						{presetTag}
@@ -39,6 +42,7 @@ type ButtonListPaneProps = {
 	inEditMode: boolean;
 	activeEdit: ActiveEdit;
 	setActivePreset: (newActiveTag: string | null) => void;
+	resetFields: () => void;
 };
 
 class Item extends Component<ItemProps> {
@@ -55,17 +59,16 @@ class Item extends Component<ItemProps> {
 				) : (
 					<button onClick={() => resize(this.props.dimensions)}>{this.props.children}</button>
 				)}
-
-				{inEditMode && <button onClick={() => deletePreset(this.props.tag)}>❌</button>}
+				{inEditMode && <button onClick={this.props.callDelete}>❌</button>}
 			</li>
 		);
 	}
 }
 
 type ItemProps = {
-	tag: string;
 	dimensions: Dimensions;
 	inEditMode: boolean;
 	isActive: boolean;
 	callEditMode: () => void;
+	callDelete: () => void;
 };

@@ -68,10 +68,11 @@ export type ActiveEdit = {
 	height: OptionalNumber;
 };
 
+// In this case, undefined means to skip that property while null means to empty that property.
 export type ActiveEditChanges = {
 	activePreset?: string | null;
-	offsetX?: OptionalNumber;
-	offsetY?: OptionalNumber;
-	width?: OptionalNumber;
-	height?: OptionalNumber;
+	offsetX?: number | null;
+	offsetY?: number | null;
+	width?: number | null;
+	height?: number | null;
 };

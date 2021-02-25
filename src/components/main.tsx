@@ -1,6 +1,6 @@
 import {ButtonListPane} from "./list";
 import {EditPane} from "./edit";
-import {table, hookTableUpdates, ActiveEdit, WindowTable} from "../util";
+import {table, hookTableUpdates, ActiveEdit, WindowTable, OptionalNumber, Dimensions} from "../util";
 
 // Extension popups don't allow inline JavaScript, so onclick is useless in the document.
 // Luckily, React generates these buttons dynamically.
@@ -35,6 +35,35 @@ export class App extends Component<{}, AppState> {
 		//browser.storage.onChanged.addListener(console.log);
 	}
 
+	// Take a new tag specified from either the edit panel or the list and check if it exists in storage.
+	// - If it exists, load the dimensions from storage.
+	// - If it doesn't exist, clear out any existing text.
+	loadDimensionsFromNewTagIfExists(newActiveTag: string | null) {
+		const presets = this.state.presets;
+
+		this.setState({
+			presetTag: newActiveTag
+		});
+
+		if (newActiveTag && presets && newActiveTag in presets) {
+			const preset = presets[newActiveTag];
+
+			this.setState({
+				offsetX: preset[0],
+				offsetY: preset[1],
+				width: preset[2],
+				height: preset[3]
+			});
+		} else {
+			this.setState({
+				offsetX: undefined,
+				offsetY: undefined,
+				width: undefined,
+				height: undefined
+			});
+		}
+	}
+
 	render() {
 		const activeEdit: ActiveEdit = {
 			presetTag: this.state.presetTag,
@@ -48,6 +77,7 @@ export class App extends Component<{}, AppState> {
 			<React.Fragment>
 				<ModeButton
 					onActivate={() =>
+						// This is here to reset all fields when toggling edit mode on and off.
 						this.setState({
 							inEditMode: !this.state.inEditMode,
 							presetTag: null,
@@ -62,29 +92,19 @@ export class App extends Component<{}, AppState> {
 					presets={this.state.presets}
 					activeEdit={activeEdit}
 					inEditMode={this.state.inEditMode}
-					setActivePreset={(newActiveTag) => {
+					setActivePreset={(newActiveTag) =>
+						// This is called whenever a user brings over an existing preset to edit it (from the list).
+						this.loadDimensionsFromNewTagIfExists(newActiveTag)
+					}
+					resetFields={() => {
+						// This should only be called if you delete an entry that you're editing. It'll reset all fields if so.
 						this.setState({
-							presetTag: newActiveTag
+							presetTag: null,
+							offsetX: undefined,
+							offsetY: undefined,
+							width: undefined,
+							height: undefined
 						});
-
-						// ERROR: Numbers are stuck, also only height seems to be saved
-						if (newActiveTag && this.state.presets && newActiveTag in this.state.presets) {
-							const preset = this.state.presets[newActiveTag];
-
-							this.setState({
-								offsetX: preset[0],
-								offsetY: preset[1],
-								width: preset[2],
-								height: preset[3]
-							});
-						} else {
-							this.setState({
-								offsetX: undefined,
-								offsetY: undefined,
-								width: undefined,
-								height: undefined
-							});
-						}
 					}}
 				></ButtonListPane>
 				{this.state.inEditMode && (
@@ -92,14 +112,18 @@ export class App extends Component<{}, AppState> {
 						presets={this.state.presets}
 						activeEdit={activeEdit}
 						modifyActive={(changes) => {
-							this.setState({
-								presetTag:
-									changes.activePreset !== undefined ? changes.activePreset : activeEdit.presetTag,
-								offsetX: changes.offsetX,
-								offsetY: changes.offsetY,
-								width: changes.width,
-								height: changes.height
-							});
+							// If activePreset is undefined, just skip it because that means the dimensions are being modified.
+							// Otherwise, ignore any other changes and pull from the active preset specified (if it exists).
+							if (changes.activePreset === undefined) {
+								this.setState({
+									offsetX: resolveChangedNumber(changes.offsetX, activeEdit.offsetX),
+									offsetY: resolveChangedNumber(changes.offsetY, activeEdit.offsetY),
+									width: resolveChangedNumber(changes.width, activeEdit.width),
+									height: resolveChangedNumber(changes.height, activeEdit.height)
+								});
+							} else {
+								this.loadDimensionsFromNewTagIfExists(changes.activePreset);
+							}
 						}}
 					></EditPane>
 				)}
@@ -122,3 +146,12 @@ class ModeButton extends Component<ModeProps> {
 type ModeProps = {
 	onActivate: () => void;
 };
+
+function resolveChangedNumber(newValue: number | null | undefined, oldValue: OptionalNumber) {
+	// If newValue was skipped, just go to oldValue.
+	if (newValue === undefined) return oldValue;
+	// If newValue is null, explicitly empty the value.
+	else if (newValue === null) return undefined;
+	// Otherwise, get newValue itself.
+	else return newValue;
+}

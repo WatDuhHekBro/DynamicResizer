@@ -5,15 +5,7 @@ export class EditPane extends Component<EditPaneProps> {
 	render() {
 		const presets = this.props.presets;
 		const activeTag = this.props.activeEdit.presetTag;
-		let isExistingTag = false;
-
-		if (presets && activeTag) {
-			isExistingTag = activeTag in presets;
-
-			if (isExistingTag) {
-				const a = presets[activeTag];
-			}
-		}
+		const isExistingTag: boolean = !!presets && !!activeTag && activeTag in presets;
 
 		return (
 			<div>
@@ -21,15 +13,9 @@ export class EditPane extends Component<EditPaneProps> {
 					<InputField
 						type="text"
 						onInput={(value) => {
-							if (value === "") {
-								this.props.modifyActive({
-									activePreset: null
-								});
-							} else {
-								this.props.modifyActive({
-									activePreset: value
-								});
-							}
+							this.props.modifyActive({
+								activePreset: value
+							});
 						}}
 						id="editPresetTag"
 						intialValue={this.props.activeEdit.presetTag ?? ""}
@@ -95,6 +81,15 @@ export class EditPane extends Component<EditPaneProps> {
 								activeEdit.width,
 								activeEdit.height
 							);
+
+							// Then automatically clear the fields once the user has confirmed their settings.
+							this.props.modifyActive({
+								activePreset: null,
+								offsetX: null,
+								offsetY: null,
+								width: null,
+								height: null
+							});
 						}
 					}}
 				>
@@ -121,12 +116,12 @@ class InputField extends Component<InputFieldProps> {
 					onInput={(event) => {
 						const value = event.currentTarget.value;
 
-						// Force explicit handling of empty inputs
+						// Force explicit handling of empty inputs by treating null as an empty string.
 						if (value !== "") this.props.onInput(value);
 						else this.props.onInput(null);
 					}}
 					id={this.props.id}
-					value={this.props.intialValue}
+					value={this.props.intialValue ?? ""}
 				></input>
 			</div>
 		);
