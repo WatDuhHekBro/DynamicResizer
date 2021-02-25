@@ -1,6 +1,4 @@
-// There shouldn't need to be any data validation since it's just my own data.
-export const table: Promise<WindowTable> = browser.storage.local.get();
-const hooks: TableHook[] = [];
+export const USER_NAMESPACE_PREFIX = "user:";
 
 // This is the core operation that resizes windows.
 export async function resize(preset: Dimensions) {
@@ -28,37 +26,18 @@ export function savePreset(
 ) {
 	const preset: Dimensions = [offsetX, offsetY, width, height];
 	browser.storage.local.set({
-		[presetTag]: preset
-	});
-	table.then((loadedTable) => {
-		loadedTable[presetTag] = preset;
-		callTableUpdate(loadedTable);
+		[USER_NAMESPACE_PREFIX + presetTag]: preset
 	});
 }
 
 export function deletePreset(presetTag: string) {
-	browser.storage.local.remove(presetTag);
-	table.then((loadedTable) => {
-		delete loadedTable[presetTag];
-		callTableUpdate(loadedTable);
-	});
-}
-
-export function hookTableUpdates(callback: TableHook) {
-	hooks.push(callback);
-}
-
-function callTableUpdate(updatedTable: WindowTable) {
-	for (const callback of hooks) {
-		callback(updatedTable);
-	}
+	browser.storage.local.remove(USER_NAMESPACE_PREFIX + presetTag);
 }
 
 export type OptionalNumber = number | undefined;
 // [offsetX, offsetY, width, height]
 export type Dimensions = [OptionalNumber, OptionalNumber, OptionalNumber, OptionalNumber];
 export type WindowTable = {[preset: string]: Dimensions};
-type TableHook = (updatedTable: WindowTable) => void;
 
 export type ActiveEdit = {
 	presetTag: string | null;

@@ -108,6 +108,7 @@ type EditPaneProps = {
 
 class InputField extends Component<InputFieldProps> {
 	render() {
+		// If value is undefined, it'll keep around stale input. That's what the empty string is for.
 		return (
 			<div>
 				<label htmlFor={this.props.id}>{this.props.children}</label>

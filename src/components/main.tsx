@@ -1,6 +1,6 @@
 import {ButtonListPane} from "./list";
 import {EditPane} from "./edit";
-import {table, hookTableUpdates, ActiveEdit, WindowTable, OptionalNumber, Dimensions} from "../util";
+import {USER_NAMESPACE_PREFIX, ActiveEdit, WindowTable, OptionalNumber} from "../util";
 
 // Extension popups don't allow inline JavaScript, so onclick is useless in the document.
 // Luckily, React generates these buttons dynamically.
@@ -18,21 +18,65 @@ export class App extends Component<{}, AppState> {
 		};
 	}
 
+	// There shouldn't need to be any data validation since it's just my own data.
 	componentDidMount() {
-		table.then((loadedTable) => {
+		browser.storage.local.get().then((loadedTable) => {
+			const transformedTable: WindowTable = {};
+
+			for (const tag in loadedTable) {
+				if (tag.startsWith(USER_NAMESPACE_PREFIX)) {
+					const presetTag = tag.substring(USER_NAMESPACE_PREFIX.length);
+					transformedTable[presetTag] = loadedTable[tag];
+				}
+			}
+
 			this.setState({
-				presets: loadedTable
+				presets: transformedTable
 			});
 		});
 
-		hookTableUpdates((updatedTable) => {
-			this.setState({
-				presets: updatedTable
+		// Synchronize any changes from the storage API into the app state.
+		browser.storage.onChanged.addListener((changes) => {
+			if (this.state.presets) {
+				for (const tag in changes) {
+					if (tag.startsWith(USER_NAMESPACE_PREFIX)) {
+						const {oldValue, newValue} = changes[tag];
+						const presetTag = tag.substring(USER_NAMESPACE_PREFIX.length);
+
+						// If an item is deleted, use the delete keyword.
+						// Otherwise, just set the value as normal.
+						if (oldValue !== undefined && newValue === undefined) {
+							const newPresets: WindowTable = {...this.state.presets};
+							delete newPresets[presetTag];
+							this.setState({
+								presets: newPresets
+							});
+						} else {
+							this.setState({
+								presets: {
+									...this.state.presets,
+									[presetTag]: newValue
+								}
+							});
+						}
+					} else {
+						switch (tag) {
+							case "order":
+								console.log('"I will have order!" - pls buff', changes[tag]);
+								break;
+							default:
+								console.warn(`Unknown Tag: "${tag}"`);
+								break;
+						}
+					}
+				}
+			}
+
+			browser.storage.local.get().then((res) => {
+				console.log("ORIGIN", res);
+				console.log("REROUT", this.state.presets);
 			});
 		});
-
-		// this is probably the better way to hook into events
-		//browser.storage.onChanged.addListener(console.log);
 	}
 
 	// Take a new tag specified from either the edit panel or the list and check if it exists in storage.
@@ -87,6 +131,7 @@ export class App extends Component<{}, AppState> {
 							height: undefined
 						})
 					}
+					inEditMode={this.state.inEditMode}
 				></ModeButton>
 				<ButtonListPane
 					presets={this.state.presets}
@@ -139,12 +184,15 @@ type AppState = {
 
 class ModeButton extends Component<ModeProps> {
 	render() {
-		return <button onClick={this.props.onActivate}>Toggle Edit Mode</button>;
+		return (
+			<button onClick={this.props.onActivate}>{this.props.inEditMode ? "Disable" : "Enable"} Edit Mode</button>
+		);
 	}
 }
 
 type ModeProps = {
 	onActivate: () => void;
+	inEditMode: boolean;
 };
 
 function resolveChangedNumber(newValue: number | null | undefined, oldValue: OptionalNumber) {
