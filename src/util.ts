@@ -59,3 +59,19 @@ export type OptionalNumber = number | undefined;
 export type Dimensions = [OptionalNumber, OptionalNumber, OptionalNumber, OptionalNumber];
 export type WindowTable = {[preset: string]: Dimensions};
 type TableHook = (updatedTable: WindowTable) => void;
+
+export type ActiveEdit = {
+	presetTag: string | null;
+	offsetX: OptionalNumber;
+	offsetY: OptionalNumber;
+	width: OptionalNumber;
+	height: OptionalNumber;
+};
+
+export type ActiveEditChanges = {
+	activePreset?: string | null;
+	offsetX?: OptionalNumber;
+	offsetY?: OptionalNumber;
+	width?: OptionalNumber;
+	height?: OptionalNumber;
+};

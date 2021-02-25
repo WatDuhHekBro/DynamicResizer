@@ -1,31 +1,38 @@
-import {savePreset, OptionalNumber} from "../util";
+import {savePreset, ActiveEdit, ActiveEditChanges, WindowTable} from "../util";
 
 // todo: update from window's existing size, auto-center, send existing preset to editor
-export class EditPane extends Component<{}, EditPaneState> {
-	constructor(props: {}) {
-		super(props);
-		this.state = {
-			presetTag: "none",
-			offsetX: undefined,
-			offsetY: undefined,
-			width: undefined,
-			height: undefined
-		};
-	}
-
+export class EditPane extends Component<EditPaneProps> {
 	render() {
+		const presets = this.props.presets;
+		const activeTag = this.props.activeEdit.presetTag;
+		let isExistingTag = false;
+
+		if (presets && activeTag) {
+			isExistingTag = activeTag in presets;
+
+			if (isExistingTag) {
+				const a = presets[activeTag];
+			}
+		}
+
 		return (
 			<div>
 				<div>
 					<InputField
 						type="text"
 						onInput={(value) => {
-							if (value)
-								this.setState({
-									presetTag: value
+							if (value === "") {
+								this.props.modifyActive({
+									activePreset: null
 								});
+							} else {
+								this.props.modifyActive({
+									activePreset: value
+								});
+							}
 						}}
 						id="editPresetTag"
+						intialValue={this.props.activeEdit.presetTag ?? ""}
 					>
 						Preset Tag
 					</InputField>
@@ -33,9 +40,10 @@ export class EditPane extends Component<{}, EditPaneState> {
 						type="number"
 						onInput={(value) => {
 							const num = Number(value);
-							if (value && num) this.setState({offsetX: num});
+							if (value && num) this.props.modifyActive({offsetX: num});
 						}}
 						id="editOffsetX"
+						intialValue={this.props.activeEdit.offsetX?.toString()}
 					>
 						Offset X
 					</InputField>
@@ -43,9 +51,10 @@ export class EditPane extends Component<{}, EditPaneState> {
 						type="number"
 						onInput={(value) => {
 							const num = Number(value);
-							if (value && num) this.setState({offsetY: num});
+							if (value && num) this.props.modifyActive({offsetY: num});
 						}}
 						id="editOffsetY"
+						intialValue={this.props.activeEdit.offsetY?.toString()}
 					>
 						Offset Y
 					</InputField>
@@ -53,9 +62,10 @@ export class EditPane extends Component<{}, EditPaneState> {
 						type="number"
 						onInput={(value) => {
 							const num = Number(value);
-							if (value && num) this.setState({width: num});
+							if (value && num) this.props.modifyActive({width: num});
 						}}
 						id="editWidth"
+						intialValue={this.props.activeEdit.width?.toString()}
 					>
 						Width
 					</InputField>
@@ -63,9 +73,10 @@ export class EditPane extends Component<{}, EditPaneState> {
 						type="number"
 						onInput={(value) => {
 							const num = Number(value);
-							if (value && num) this.setState({height: num});
+							if (value && num) this.props.modifyActive({height: num});
 						}}
 						id="editHeight"
+						intialValue={this.props.activeEdit.height?.toString()}
 					>
 						Height
 					</InputField>
@@ -73,28 +84,31 @@ export class EditPane extends Component<{}, EditPaneState> {
 				<button>Auto Center</button>
 				<button
 					onClick={() => {
-						savePreset(
-							this.state.presetTag,
-							this.state.offsetX,
-							this.state.offsetY,
-							this.state.width,
-							this.state.height
-						);
+						const activeEdit = this.props.activeEdit;
+
+						// Only save a preset if there's a tag to begin with.
+						if (activeEdit.presetTag) {
+							savePreset(
+								activeEdit.presetTag,
+								activeEdit.offsetX,
+								activeEdit.offsetY,
+								activeEdit.width,
+								activeEdit.height
+							);
+						}
 					}}
 				>
-					Save Preset
+					{isExistingTag ? "Save Preset" : "Create New Preset"}
 				</button>
 			</div>
 		);
 	}
 }
 
-type EditPaneState = {
-	presetTag: string;
-	offsetX: OptionalNumber;
-	offsetY: OptionalNumber;
-	width: OptionalNumber;
-	height: OptionalNumber;
+type EditPaneProps = {
+	presets: WindowTable | null;
+	activeEdit: ActiveEdit;
+	modifyActive: (changes: ActiveEditChanges) => void;
 };
 
 class InputField extends Component<InputFieldProps> {
@@ -112,6 +126,7 @@ class InputField extends Component<InputFieldProps> {
 						else this.props.onInput(null);
 					}}
 					id={this.props.id}
+					value={this.props.intialValue}
 				></input>
 			</div>
 		);
@@ -121,5 +136,6 @@ class InputField extends Component<InputFieldProps> {
 type InputFieldProps = {
 	type: string;
 	id: string;
+	intialValue?: string;
 	onInput: (value: string | null) => void;
 };

@@ -1,33 +1,9 @@
-import {table, resize, deletePreset, hookTableUpdates, WindowTable, Dimensions} from "../util";
+import {resize, deletePreset, WindowTable, Dimensions, ActiveEdit} from "../util";
 
 // todo: order of entries, move function
-export class ButtonListPane extends Component<ButtonListPaneProps, ButtonListPaneState> {
-	constructor(props: ButtonListPaneProps) {
-		super(props);
-		this.state = {
-			presets: null
-		};
-	}
-
-	componentDidMount() {
-		table.then((loadedTable) => {
-			this.setState({
-				presets: loadedTable
-			});
-		});
-
-		hookTableUpdates((updatedTable) => {
-			this.setState({
-				presets: updatedTable
-			});
-		});
-
-		// this is probably the better way to hook into events
-		//browser.storage.onChanged.addListener(console.log);
-	}
-
+export class ButtonListPane extends Component<ButtonListPaneProps> {
 	render() {
-		const presets = this.state.presets;
+		const presets = this.props.presets;
 
 		if (presets) {
 			const items: JSX.Element[] = [];
@@ -35,7 +11,17 @@ export class ButtonListPane extends Component<ButtonListPaneProps, ButtonListPan
 			for (const presetTag in presets) {
 				const preset = presets[presetTag];
 				items.push(
-					<Item tag={presetTag} dimensions={preset} inEditMode={this.props.inEditMode}>
+					<Item
+						tag={presetTag}
+						dimensions={preset}
+						inEditMode={this.props.inEditMode}
+						isActive={presetTag === this.props.activeEdit.presetTag}
+						callEditMode={() => {
+							this.props.setActivePreset(
+								this.props.activeEdit.presetTag === presetTag ? null : presetTag
+							);
+						}}
+					>
 						{presetTag}
 					</Item>
 				);
@@ -49,11 +35,10 @@ export class ButtonListPane extends Component<ButtonListPaneProps, ButtonListPan
 }
 
 type ButtonListPaneProps = {
-	inEditMode: boolean;
-};
-
-type ButtonListPaneState = {
 	presets: WindowTable | null;
+	inEditMode: boolean;
+	activeEdit: ActiveEdit;
+	setActivePreset: (newActiveTag: string | null) => void;
 };
 
 class Item extends Component<ItemProps> {
@@ -63,8 +48,14 @@ class Item extends Component<ItemProps> {
 		return (
 			<li>
 				{inEditMode && <button onClick={() => console.log("todo reorder")}>≡</button>}
-				<button onClick={() => resize(this.props.dimensions)}>{this.props.children}</button>
-				{inEditMode && <button onClick={() => console.log("todo edit")}>✏️</button>}
+				{inEditMode ? (
+					<button onClick={this.props.callEditMode}>{`${this.props.children as string} ${
+						this.props.isActive ? "✏️" : "🔧"
+					}`}</button>
+				) : (
+					<button onClick={() => resize(this.props.dimensions)}>{this.props.children}</button>
+				)}
+
 				{inEditMode && <button onClick={() => deletePreset(this.props.tag)}>❌</button>}
 			</li>
 		);
@@ -75,4 +66,6 @@ type ItemProps = {
 	tag: string;
 	dimensions: Dimensions;
 	inEditMode: boolean;
+	isActive: boolean;
+	callEditMode: () => void;
 };
