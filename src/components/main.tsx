@@ -15,7 +15,7 @@ export class App extends Component<{}, AppState> {
 		return (
 			<React.Fragment>
 				<ModeButton onActivate={() => this.setState({inEditMode: !this.state.inEditMode})}></ModeButton>
-				<ButtonListPane></ButtonListPane>
+				<ButtonListPane inEditMode={this.state.inEditMode}></ButtonListPane>
 				{this.state.inEditMode && <EditPane></EditPane>}
 			</React.Fragment>
 		);

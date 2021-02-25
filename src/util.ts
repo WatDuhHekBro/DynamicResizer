@@ -1,36 +1,61 @@
+// There shouldn't need to be any data validation since it's just my own data.
+export const table: Promise<WindowTable> = browser.storage.local.get();
+const hooks: TableHook[] = [];
+
 // This is the core operation that resizes windows.
-export async function resize(width: number, height: number, offsetX: number, offsetY: number) {
+export async function resize(preset: Dimensions) {
 	const window = await browser.windows.getCurrent();
 
 	if (window.id) {
-		// >> Updates the properties of a window. Specify only the properties that you want to change; unspecified properties will be left unchanged.
 		browser.windows.update(window.id, {
-			top: offsetY,
-			left: offsetX,
-			width: width,
-			height: height
+			left: preset[0],
+			top: preset[1],
+			width: preset[2],
+			height: preset[3]
 		});
+	}
+
+	// only if window.state === "normal" should the control panel capture the window size
+	//console.log(window.left, window.top, window.width, window.height, window.state === "normal");
+}
+
+export function savePreset(
+	presetTag: string,
+	offsetX: OptionalNumber,
+	offsetY: OptionalNumber,
+	width: OptionalNumber,
+	height: OptionalNumber
+) {
+	const preset: Dimensions = [offsetX, offsetY, width, height];
+	browser.storage.local.set({
+		[presetTag]: preset
+	});
+	table.then((loadedTable) => {
+		loadedTable[presetTag] = preset;
+		callTableUpdate(loadedTable);
+	});
+}
+
+export function deletePreset(presetTag: string) {
+	browser.storage.local.remove(presetTag);
+	table.then((loadedTable) => {
+		delete loadedTable[presetTag];
+		callTableUpdate(loadedTable);
+	});
+}
+
+export function hookTableUpdates(callback: TableHook) {
+	hooks.push(callback);
+}
+
+function callTableUpdate(updatedTable: WindowTable) {
+	for (const callback of hooks) {
+		callback(updatedTable);
 	}
 }
 
-// There shouldn't need to be any data validation since it's just my own data.
-export const table: Promise<WindowTable> = browser.storage.local.get();
-
-export async function setWebsite(
-	website: string,
-	width: number,
-	height: number,
-	offsetX: number,
-	offsetY: number
-): Promise<SetWebsiteStatus> {
-	return SetWebsiteStatus.SUCCESS;
-}
-
-type OptionalNumber = number | null;
-type Dimensions = [OptionalNumber, OptionalNumber, OptionalNumber, OptionalNumber];
-type WindowTable = {[website: string]: Dimensions};
-
-enum SetWebsiteStatus {
-	SUCCESS,
-	FAIL
-}
+export type OptionalNumber = number | undefined;
+// [offsetX, offsetY, width, height]
+export type Dimensions = [OptionalNumber, OptionalNumber, OptionalNumber, OptionalNumber];
+export type WindowTable = {[preset: string]: Dimensions};
+type TableHook = (updatedTable: WindowTable) => void;
